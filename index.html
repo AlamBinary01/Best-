@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisdom Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --WIDTH: 500px;
+            --card-ratio: 1.4;
+            --color-primary: #6a1b9a;
+            --color-secondary: #ff80ab;
+            --color-text: #ffffff;
+            --font-title: 'Pacifico', cursive;
+            --font-content: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #3f51b5, #1a237e);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-content);
+            color: var(--color-text);
+        }
+
+        .card-container {
+            width: var(--WIDTH);
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .envelope {
+            width: 100%;
+            height: calc(var(--WIDTH) / var(--card-ratio));
+            background: var(--color-primary);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, var(--color-secondary), var(--color-primary));
+            transform-origin: top center;
+            transform: rotateX(0deg);
+            z-index: 2;
+        }
+
+        .mask {
+            position: relative;
+            width: calc(var(--WIDTH) * 0.95);
+            height: calc(var(--WIDTH) / var(--card-ratio) * 1.5);
+            margin: auto;
+            top: 50%;
+            transform: translateY(-50%);
+            clip-path: inset(0 0 100% 0);
+            overflow: hidden;
+        }
+
+        .card {
+            width: 100%;
+            height: calc(var(--WIDTH) / var(--card-ratio));
+            background: var(--color-secondary);
+            border-radius: 10px;
+            transform-origin: center top;
+            transform: translateY(100%);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            position: absolute;
+            backface-visibility: hidden;
+        }
+
+        .front h1 {
+            font-family: var(--font-title);
+            font-size: 2.5rem;
+            margin: 0;
+            color: var(--color-primary);
+        }
+
+        .front p {
+            font-family: var(--font-content);
+            font-size: 1.2rem;
+            color: var(--color-text);
+            margin-top: 10px;
+        }
+
+        .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            background: linear-gradient(135deg, var(--color-primary), #4a148c);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--color-text);
+        }
+
+        .back img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 20px;
+            background: var(--color-primary);
+            color: var(--color-text);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: var(--color-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="card-container">
+        <div class="envelope">
+            <div class="flap"></div>
+            <div class="mask">
+                <div class="card">
+                    <div class="front">
+                        <h1>Embrace Kindness</h1>
+                        <p>"A little kindness can transform a bad day into a great one."</p>
+                    </div>
+                    <div class="back">
+                        <img src="https://example.com/kindness-icon.png" alt="Kindness Icon">
+                        <p>Take time to compliment someone's efforts or help a colleague with their task.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button id="toggle">Open Wisdom</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script>
+        const flap = document.querySelector('.flap');
+        const mask = document.querySelector('.mask');
+        const card = document.querySelector('.card');
+        const button = document.querySelector('#toggle');
+        const frontTitle = document.querySelector('.front h1');
+        const frontText = document.querySelector('.front p');
+        const backText = document.querySelector('.back p');
+        let isOpen = false;
+
+        const advice = [
+            { title: "Embrace Kindness", detail: "Be kind in words and actions every day." },
+            { title: "Practice Gratitude", detail: "Acknowledge and thank those who make your life better." },
+            { title: "Lead with Empathy", detail: "Put yourself in others' shoes before reacting." },
+        ];
+
+        button.addEventListener('click', () => {
+            if (!isOpen) {
+                // Flip animation
+                gsap.timeline()
+                    .to(flap, { rotationX: -180, duration: 1 })
+                    .to(mask, { clipPath: 'inset(0 0 0% 0)', duration: 1 }, '-=0.5')
+                    .to(card, { translateY: '0%', duration: 1 }, '-=0.5');
+                // Change advice content
+                const randomAdvice = advice[Math.floor(Math.random() * advice.length)];
+                frontTitle.textContent = randomAdvice.title;
+                frontText.textContent = `"${randomAdvice.detail}"`;
+                backText.textContent = randomAdvice.detail;
+                button.textContent = "Flip Card";
+            } else {
+                // Flip card to show back content
+                gsap.to(card, { rotationY: card.style.transform === 'rotateY(180deg)' ? 0 : 180, duration: 1 });
+                button.textContent = "Open Wisdom";
+            }
+            isOpen = !isOpen;
+        });
+    </script>
+</body>
+</html>
